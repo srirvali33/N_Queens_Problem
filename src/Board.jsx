@@ -3,51 +3,56 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Cell from './Cell';
-import Form from 'react-bootstrap/Form';
 import getQueenPositions from './placements'
 
-const Board = () => {
-    const [input, setInput] = useState(8);
+const Board = (props) => {
+     const { inp } = props;
 
-    const rowLine= new Array(input).fill(0);
-    const colLine= new Array(input).fill(0);
-    const positions= getQueenPositions(input)[0];
-
-    const [boardInp, setBoardInp] = useState({rowLine:rowLine, colLine:colLine, positions:positions});
-    
+     const [rowLineState, setRowLineState] = useState(new Array(inp).fill(0));
+     const [colLineState, setColLineState] = useState(new Array(inp).fill(0));
+     const [positionsState, setPositionsState] = useState([]);
 
 
-     function enterBoard(){
-          setBoardInp(
-               {rowLine:rowLine, colLine:colLine, positions:positions}
-          );
+     useEffect(() => {
+          async function fetchData() {
+               const response = await getQueenPositions(inp);
+               setRowLineState(new Array(inp).fill(0));
+               setColLineState(new Array(inp).fill(0));
+               setPositionsState(response[0]);
+          }
+          fetchData();
+
+     }, [inp]);
+
+
+     console.log("positionsState", positionsState);
+
+
+     function RowLine(props) {
+          const { rowval } = props;
+          const classColor = rowval % 2 == 0 ? true : false;
+          return (
+               <div className='row'>
+                    {rowLineState.map((i, col) => (
+                         <Cell key={col} classVal={col % 2 == 0 ? classColor ? 'beige' : 'black' : classColor ? 'black' : 'beige'} showQueen={positionsState && positionsState[rowval] && positionsState[rowval][col] == 'Q'} />
+                    ))}
+               </div>
+          )
      }
-    
 
-
-    function RowLine(props){
-      const {rowval} =props;
-      const classColor= rowval%2==0? true: false;
-      return (
-        <div className='row'>
-        {boardInp['rowLine'].map((i, col) => (
-             <Cell classVal={col%2==0 ?classColor?'beige':'black':classColor?'black':'beige'} showQueen={boardInp['positions'] && boardInp['positions'][rowval][col]=='Q'}/>
-        ))}
-        </div>
-    )
-    }
+     if (rowLineState.length <= 3) {
+          return <>No Valid Board Solutions for now</>
+     }
 
 
 
-   return(
-    <Container fluid className='col'>
-        <Form.Label>Board size entry</Form.Label>
-        <Form.Control type="text" placeholder="board size" value={input} onChange={(e)=>setInput(e.target.value)} onEnter={(e)=>enterBoard()}/>
-        <br/>
-        {boardInp && boardInp['colLine'].map((inp,index) => (
-             <RowLine rowval={index}/>
-        ))}
-   </Container>)
+     return (
+          <Container fluid className='col'>
+               <br />
+               {colLineState.map((inp, index) => (
+                    <RowLine key={index} rowval={index} />
+               ))}
+          </Container>)
 }
 
 export default Board;
