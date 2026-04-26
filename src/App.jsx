@@ -19,7 +19,7 @@ function App() {
     }, 1000);
   };
 
-    if (loadBoard===true) {
+    if (loadBoard) {
     return <>Loading...</>
   };
 
