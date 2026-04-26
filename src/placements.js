@@ -1,6 +1,6 @@
 var getQueenPositions = function(n) {
     //create empty chess board
-    //String in javascript is immutable, so here I use 2D array for chess board
+
     var chessBoard = new Array(n);
     for(var i = 0; i < n; i++) {
         chessBoard[i] = new Array(n).fill(".");

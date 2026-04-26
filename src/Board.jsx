@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,25 +8,25 @@ import getQueenPositions from './placements'
 const Board = (props) => {
      const { inp } = props;
 
+     if(inp < 4) {
+          return <>No Valid Board Solutions for this size</>
+     }
+
+     if (inp > 11) {
+          return <>Board size too large to compute solutions</>
+     }
+
+     const response = getQueenPositions(inp);
      const [rowLineState, setRowLineState] = useState(new Array(inp).fill(0));
      const [colLineState, setColLineState] = useState(new Array(inp).fill(0));
-     const [positionsState, setPositionsState] = useState([]);
+     const [positionsState, setPositionsState] = useState(response[0]);
 
 
      useEffect(() => {
-          async function fetchData() {
-               const response = await getQueenPositions(inp);
-               setRowLineState(new Array(inp).fill(0));
-               setColLineState(new Array(inp).fill(0));
-               setPositionsState(response[0]);
-          }
-          fetchData();
-
+          setRowLineState(new Array(inp).fill(0));
+          setColLineState(new Array(inp).fill(0));
+          setPositionsState(response[0]);
      }, [inp]);
-
-
-     console.log("positionsState", positionsState);
-
 
      function RowLine(props) {
           const { rowval } = props;
@@ -39,12 +39,6 @@ const Board = (props) => {
                </div>
           )
      }
-
-     if (rowLineState.length <= 3) {
-          return <>No Valid Board Solutions for now</>
-     }
-
-
 
      return (
           <Container fluid className='col'>
